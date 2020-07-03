@@ -151,7 +151,7 @@ freqPerFile = getFreqPerFile(pdfFiles)
 
 G = nx.Graph()
 #the colors used in the graph.
-colors = ['#FF6E6E','#6EBEFF','#32A858','#fcba03','#af33e8','#d148f0','#f51bac','#e8e82c','#c7c7a1','#5c917a']
+colors = ['#202970','#2E61A5','#4893CF','#48958F','#48914E','#94B945','#F0E855','#DC973A','#C63127','#C52C4F']
 mp = {}
 cnt = 0
 for i in range(2008,2018):
