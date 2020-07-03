@@ -5,6 +5,7 @@ from pdfminer3.pdfinterp import PDFPageInterpreter
 from pdfminer3.converter import PDFPageAggregator
 from pdfminer3.converter import TextConverter
 from networkx.drawing.nx_agraph import graphviz_layout
+from nltk.stem import SnowballStemmer
 from os import listdir
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -131,11 +132,20 @@ def getFreqPerFile(pdfFiles):
         freq.append(curr)
     return freq
 
+def stemmatiztion(tokens):
+    ps = SnowballStemmer(language='english')
+    return list(map(ps.stem,tokens))
+
 temp = PArseTXTFromDir("pdftotext")
 pdfFiles = temp[0]
 yearOfFile = temp[1]
 pdfFiles = cleanFiles(pdfFiles,ParseTXTFile("ignoreList.txt"))
+pdfFiles = [[stemmatiztion(line) for line in file] for file in pdfFiles]
 freq = getFreq(pdfFiles)
+pdfFiles = [[[word for word in line if freq[word]>5] for line in file] for file in pdfFiles]
+freq = dict((word,value) for word, value in freq.items() if freq[word]>5)
+print(len(freq))
+quit(0)
 makeWordsTxt(freq)
 freqPerFile = getFreqPerFile(pdfFiles)
 
@@ -199,8 +209,13 @@ for word1 in freq:
                     id = i
             G[word1][word2]['color'] = colors[mp[int(yearOfFile[id])]]
 
+
 edgeColors = [G[u][v]['color'] for u,v in G.edges]
-weights = [G[u][v]['weight']*0.2 for u,v in G.edges]
+weights = [G[u][v]['weight']*0.1 for u,v in G.edges]
+for edge in G.edges:
+  if G[edge[0]][edge[1]]['weight'] <= 5:
+    G.remove_edge(edge[0],edge[1])
+
 print(G.number_of_edges())
 print(G.number_of_nodes())
 print("drawing")
